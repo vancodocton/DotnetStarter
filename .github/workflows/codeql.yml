@@ -39,15 +39,6 @@ jobs:
       # only required for workflows in private repositories
       actions: read
       contents: read
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - language: actions
-            build-mode: none
-          - language: csharp
-            build-mode: manual
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
