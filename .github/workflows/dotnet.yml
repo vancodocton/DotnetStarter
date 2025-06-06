@@ -1,0 +1,67 @@
+name: .NET CI
+
+on:
+  push:
+    branches: ["main", "dev"]
+    paths:
+      - src/**
+      - test/**
+      - .github/workflows/dotnet.yml
+      - .config/dotnet-tools.json
+      - global.json
+      - "*.slnx"
+      - Directory.*.props
+      - Directory.*.targets
+      - coverage.config
+  pull_request:
+    branches: ["main"]
+    paths:
+      - src/**
+      - test/**
+      - .github/workflows/dotnet.yml
+      - .config/dotnet-tools.json
+      - global.json
+      - "*.slnx"
+      - Directory.*.props
+      - Directory.*.targets
+      - coverage.config
+  workflow_dispatch:
+
+env:
+  SOLUTION: ""
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          cache: true
+          cache-dependency-path: |
+            Directory.Packages.props
+            **/packages.lock.json
+            **/dotnet-tools.json
+      - name: Restore .NET tools
+        run: dotnet tool restore
+      - name: Restore
+        run: dotnet restore ${{ env.SOLUTION }}
+      - name: Build
+        run: dotnet build ${{ env.SOLUTION }} --no-restore --configuration Release
+      - name: Verify Format
+        run: dotnet format ${{ env.SOLUTION }} --no-restore --verify-no-changes -v diag --severity info
+      - name: Test
+        shell: pwsh
+        run: |
+          dotnet test ${{ env.SOLUTION }} --no-build --configuration Release --verbosity normal -- --coverage --coverage-settings $pwd/coverage.config --coverage-output-format xml --report-xunit
+          dotnet coverage merge **/TestResults/**.xml --output coverage.xml --output-format xml
+      - name: Upload TestResults Artifacts
+        uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: ${{ runner.os }}-TestResults
+          path: |
+            **/TestResults/**
+            coverage.xml
