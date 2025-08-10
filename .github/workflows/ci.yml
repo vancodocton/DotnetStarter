@@ -6,7 +6,7 @@ on:
     paths:
       - src/**
       - test/**
-      - .github/workflows/dotnet.yml
+      - .github/workflows/ci.yml
       - .config/dotnet-tools.json
       - global.json
       - "*.slnx"
