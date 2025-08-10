@@ -19,6 +19,7 @@ on:
     paths:
       - src/**
       - test/**
+      - .github/workflows/ci.yml
       - .github/workflows/dotnet.yml
       - .config/dotnet-tools.json
       - global.json
