@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "dev"]
+    paths:
+      - src/**
+      - test/**
+      - .github/workflows/ci.yml
+      - .github/workflows/dotnet.yml
+      - .config/dotnet-tools.json
+      - global.json
+      - "*.slnx"
+      - Directory.*.props
+      - Directory.*.targets
+      - coverage.config
+  pull_request:
+    branches: ["main"]
+    paths:
+      - src/**
+      - test/**
+      - .github/workflows/ci.yml
+      - .github/workflows/dotnet.yml
+      - .config/dotnet-tools.json
+      - global.json
+      - "*.slnx"
+      - Directory.*.props
+      - Directory.*.targets
+      - coverage.config
+  workflow_dispatch:
+
+jobs:
+  dotnet-build-test:
+    uses: ./.github/workflows/dotnet.yml
+    with:
+      Solution: ""
+    secrets: inherit
